@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Test savol-javob</title>
+</head>
+<body>
+  <h1>Test savol-javob qidiruvi</h1>
+
+  <textarea id="inp" placeholder="Savolni yozing..."></textarea>
+  <br><br>
+  <button onclick="run()">Qidir</button>
+
+  <div id="out"></div>
+
+  <script src="data.js"></script>
+  <script>
+    function run() {
+      const q = document.getElementById("inp").value.toLowerCase();
+      let topildi = null;
+
+      for (const item of QA) {
+        if (q.includes(item.q.toLowerCase().slice(0, 10))) { 
+          // qisqa qidiruv
+          topildi = item;
+          break;
+        }
+      }
+
+      const out = document.getElementById("out");
+      if (topildi) {
+        out.innerHTML = `
+          <h3>${topildi.q}</h3>
+          <p>To‘g‘ri javob: <b>${topildi.answer}</b></p>
+        `;
+      } else {
+        out.innerHTML = "<p>Savol topilmadi.</p>";
+      }
+    }
+  </script>
+</body>
+</html>
