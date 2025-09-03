@@ -1,22 +1,17 @@
 let lastInput = ""; // oxirgi yozilgan matnni saqlash uchun
 
-function normalizeText(text) {
-  return text
-    .toLowerCase()
-    .replace(/[’'`‘]/g, "'")   // turli apostroflarni bitta ko‘rinishga keltirish
-    .replace(/[“”«»]/g, '"')   // turli qo‘shtirnoqlarni keltirish
-    .replace(/[?.!,]/g, "")    // tinish belgilarini olib tashlash
-    .trim();
-}
-
 function findAnswers() {
   const inputField = document.getElementById("inputQuestions");
   const input = inputField.value.trim();
-  const resultsDiv = document.getElementById("results");
-  resultsDiv.innerHTML = "";
+
+  const foundDiv = document.getElementById("found");
+  const notFoundDiv = document.getElementById("notfound");
+
+  foundDiv.innerHTML = "<h3>✅ Topilgan savollar</h3>";
+  notFoundDiv.innerHTML = "<h3>❌ Topilmagan savollar</h3>";
 
   if (!input) {
-    resultsDiv.innerHTML = "<p>Iltimos, savollarni kiriting!</p>";
+    notFoundDiv.innerHTML += "<p>Iltimos, savollarni kiriting!</p>";
     return;
   }
 
@@ -28,41 +23,30 @@ function findAnswers() {
     .map(s => s.trim())
     .filter(s => s.length > 0);
 
-  // Variant belgilarini chiqarib tashlaymiz (A), B), 1), 2))
+  // Variantlarni chiqarib tashlaymiz (masalan 1), 2), A), B))
   const savollar = satrlar.filter(s => !/^[A-D]\)|^\d+\)/i.test(s));
 
   if (savollar.length === 0) {
-    resultsDiv.innerHTML = "<p>Savol topilmadi (variantlar emas, savol kiriting)</p>";
+    notFoundDiv.innerHTML += "<p>Savol topilmadi (variantlar emas, savol kiriting)</p>";
     return;
   }
 
   savollar.forEach(savol => {
-    const cleanSavol = normalizeText(savol);
+    // ❗ faqat to‘liq moslikni tekshiramiz
+    let topildi = data.find(item => item.savol.trim() === savol.trim());
 
-    // 1️⃣ Bazadan aniq qidiramiz
-    let topildi = data.find(item => normalizeText(item.savol) === cleanSavol);
-
-    // 2️⃣ Agar topilmasa, o‘xshash qidiramiz
-    if (!topildi) {
-      topildi = data.find(item =>
-        normalizeText(item.savol).includes(cleanSavol) ||
-        cleanSavol.includes(normalizeText(item.savol))
-      );
-    }
-
-    // Natijani chiqaramiz
     if (topildi) {
-      resultsDiv.innerHTML += `
-        <div class="question">
+      foundDiv.innerHTML += `
+        <div class="question found">
           <b>Savol:</b> ${savol}<br>
-          <b>Javob:</b> ✅ ${topildi.javob}
+          <b>Javob:</b> ${topildi.javob}
         </div>
       `;
     } else {
-      resultsDiv.innerHTML += `
-        <div class="question">
+      notFoundDiv.innerHTML += `
+        <div class="question notfound">
           <b>Savol:</b> ${savol}<br>
-          <b>Javob:</b> ❌ Topilmadi
+          <b>Javob:</b> Topilmadi
         </div>
       `;
     }
@@ -71,7 +55,8 @@ function findAnswers() {
 
 function clearAll() {
   document.getElementById("inputQuestions").value = "";
-  document.getElementById("results").innerHTML = "";
+  document.getElementById("found").innerHTML = "<h3>✅ Topilgan savollar</h3>";
+  document.getElementById("notfound").innerHTML = "<h3>❌ Topilmagan savollar</h3>";
 }
 
 function undoInput() {
